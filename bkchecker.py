@@ -29,12 +29,14 @@ if not TRACKER_URL:
     print("Please enter the url of the multiworld tracker (Looks like https://archipelago.gg/tracker/AAAAAAA):")
     TRACKER_URL = input().strip()
     dotenv.set_key('.env', 'TRACKER_URL', TRACKER_URL)
+    print("Tracker URL saved to .env file")
 
 if not SPOILER_PATH:
     print("Please enter the path to the spoiler log (Including playthrough)")
     print("(Looks like C:\\ProgramData\\Archipelago\\output\\AP_03331224368454627526\\AP_03331224368454627526_Spoiler.txt or https://archipelago.gg/dl_spoiler/AAAAAAA):")
     SPOILER_PATH = input().strip()
     dotenv.set_key('.env', 'SPOILER_PATH', SPOILER_PATH)
+    print("Spoiler path saved to .env file")
 
 def process_table(table: Tag) -> list[dict]:
     headers = [i.string for i in table.find_all("th")]
