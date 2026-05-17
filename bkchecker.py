@@ -38,6 +38,12 @@ if not SPOILER_PATH:
     dotenv.set_key('.env', 'SPOILER_PATH', SPOILER_PATH)
     print("Spoiler path saved to .env file")
 
+def exit(code: int = 0):
+    if getattr(sys, 'frozen', False):
+        print("Press enter to exit")
+        input()
+    sys.exit(code)
+
 def process_table(table: Tag) -> list[dict]:
     headers = [i.string for i in table.find_all("th")]
     rows = [[try_int(i) for i in r.find_all("td")] for r in table.find_all("tr")[1:]]
@@ -87,10 +93,10 @@ elif re.match(r'^https?://', SPOILER_PATH):
         lines = req.text.splitlines()
     else:
         print("Failed to fetch spoiler log from url")
-        sys.exit(1)
+        exit(-1)
 else:
     print("Invalid spoiler path")
-    sys.exit(1)
+    exit(-2)
 
 player_checks: dict[str, dict] = {}
 inPlaythrough = False
@@ -118,7 +124,7 @@ for line in lines:
                 print(f"Missing: {location_name} ({slotname}) in sphere {sphere}")
                 abort = True
         if abort:
-            sys.exit(1)
+            exit(2)
         pass
     elif not line.strip():
         pass  # Blank line
@@ -128,6 +134,4 @@ for line in lines:
         inPlaythrough = False
         print("Unexpected:" + line)
 
-if getattr(sys, 'frozen', False):
-    print("Press enter to exit")
-    input()
+exit(0)
