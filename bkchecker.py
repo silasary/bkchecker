@@ -84,7 +84,7 @@ def fetch_tracker(room: str, slot: int) -> dict[str, bool]:
 
 lineRegex = r'^\s*(.*) \((.{1,16}?)\):\s+(.*)\((.{1,16}?)\)$'
 
-if os.path.exists(SPOILER_PATH):
+if os.path.exists(SPOILER_PATH) and os.path.isfile(SPOILER_PATH):
     with open(SPOILER_PATH, 'r') as f:
         lines = f.readlines()
 elif re.match(r'^https?://', SPOILER_PATH):
