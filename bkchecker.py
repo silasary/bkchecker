@@ -2,6 +2,7 @@
 # dependencies = [
 #   "requests",
 #   "beautifulsoup4",
+#   "python-dotenv",
 # ]
 # ///
 
@@ -12,13 +13,28 @@
 # This is designed with the intention of untangling BK'd multiworlds without anyone (even the host) having to read the spoiler log directly.
 # If it doesn't work, let me know, this was thrown together in an afternoon and tested on exactly one multiworld.
 
+import os
 import re
 import sys
 import requests
 from bs4 import BeautifulSoup, Tag
+import dotenv
 
-TRACKER_URL = 'https://archipelago.gg/tracker/98qiZnCwT7K1xea9_gYl3A'
-SPOILER_PATH = "C:\\ProgramData\\Archipelago\\output\\AP_03331224368454627526\\AP_03331224368454627526_Spoiler.txt"
+dotenv.load_dotenv()
+
+TRACKER_URL = os.getenv("TRACKER_URL", None)
+SPOILER_PATH = os.getenv("SPOILER_PATH", None)
+
+if not TRACKER_URL:
+    print("Please enter the url of the multiworld tracker (Looks like https://archipelago.gg/tracker/AAAAAAA):")
+    TRACKER_URL = input().strip()
+    dotenv.set_key('.env', 'TRACKER_URL', TRACKER_URL)
+
+if not SPOILER_PATH:
+    print("Please enter the path to the spoiler log (Including playthrough)")
+    print("(Looks like C:\\ProgramData\\Archipelago\\output\\AP_03331224368454627526\\AP_03331224368454627526_Spoiler.txt or https://archipelago.gg/dl_spoiler/AAAAAAA):")
+    SPOILER_PATH = input().strip()
+    dotenv.set_key('.env', 'SPOILER_PATH', SPOILER_PATH)
 
 def process_table(table: Tag) -> list[dict]:
     headers = [i.string for i in table.find_all("th")]
@@ -60,8 +76,19 @@ def fetch_tracker(room: str, slot: int) -> dict[str, bool]:
 
 lineRegex = r'^\s*(.*) \((.{1,16}?)\):\s+(.*)\((.{1,16}?)\)$'
 
-with open(SPOILER_PATH, 'r') as f:
-    lines = f.readlines()
+if os.path.exists(SPOILER_PATH):
+    with open(SPOILER_PATH, 'r') as f:
+        lines = f.readlines()
+elif re.match(r'^https?://', SPOILER_PATH):
+    req = requests.get(SPOILER_PATH)
+    if req.status_code == 200:
+        lines = req.text.splitlines()
+    else:
+        print("Failed to fetch spoiler log from url")
+        sys.exit(1)
+else:
+    print("Invalid spoiler path")
+    sys.exit(1)
 
 player_checks: dict[str, dict] = {}
 inPlaythrough = False
