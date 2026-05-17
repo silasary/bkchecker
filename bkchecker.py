@@ -128,3 +128,6 @@ for line in lines:
         inPlaythrough = False
         print("Unexpected:" + line)
 
+if getattr(sys, 'frozen', False):
+    print("Press enter to exit")
+    input()
