@@ -42,3 +42,13 @@ jobs:
           name: app-${{ matrix.os }}
           path: build/**
           if-no-files-found: ignore
+          
+      - name: Add to Release
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda  # v3.0.0
+        with:
+          files: |
+            build/**
+          fail_on_unmatched_files: true
+          overwrite_files: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
